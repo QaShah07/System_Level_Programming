@@ -2,7 +2,7 @@
 using namespace std;
 void rec(int n)
 {
-	if(n>1)
+	if(n >1)
 	{
 		rec(n/2);
 	}
