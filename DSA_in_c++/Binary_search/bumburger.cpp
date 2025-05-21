@@ -17,7 +17,7 @@ bool check(int mid) {
     int cc = max(0LL, (mid * c - nc)) * pc;
     return (cb + cs + cc) <= money;
 }
-
+// binary Search
 void binarySearch() {
     int lo = 0, hi = 1e13, ans = 0;
     while (lo <= hi) {

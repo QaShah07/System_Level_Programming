@@ -15,7 +15,7 @@ public:
 	}
 	// getter method for access this
 	const std::string getColor() const {return color_; }
-	double getRadius() const {return radius_; }
+	double getRadius() 	const {return radius_; }
 	
 };
 void print(const Ball& ball)

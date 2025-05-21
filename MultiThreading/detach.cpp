@@ -12,6 +12,7 @@ void run(int count) {
 		cout << "shah and akansha" << endl;
 	}
 	std::this_thread::sleep_for(chrono::seconds(5));
+	cout<<"thread fininshed"<<endl;
 }
 
 int main() {
