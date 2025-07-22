@@ -11,7 +11,7 @@ vector<vector<int>>eg; // this is integer
 // check funtion
 bool check(int x, int y)
 {
-	if(x>=0 && x<n && y>=0 && y<m)
+	if(x>=0 && x<n && y>=0 && y<m && vis[x][y] ==0 && eg[x][y]==0)
 	{
 		return 1;
 	}
@@ -23,14 +23,14 @@ bool check(int x, int y)
 // neighbour funtion which decide how to move
 int dx[] = {1,0,-1,0};
 int dy[] = {0,1,0,-1};
-vector<state> neighbours(state cur, bool skip_value_check = false)
+vector<state> neighbours(state cur)
 {
 	vector<state>ans;
 	for(int k=0;k<4;k++)
 	{
 		int nx = cur.F+dx[k];
 		int ny = cur.S+dy[k];
-		if(check(nx,ny) && (skip_value_check || eg[nx][ny]==0))
+		if(check(nx,ny))
 		{
 			ans.push_back({nx,ny});
 		}
@@ -41,8 +41,10 @@ vector<state> neighbours(state cur, bool skip_value_check = false)
 void bfs(state start_node)
 {
 	queue<state>q;
-	vis[start_node.F][start_node.S] = 2;
+	vector<state>component;
 	q.push(start_node);
+	component.push_back(start_node);
+	vis[start_node.F][start_node.S] = 1;
 	// first we are going to compute the size
 	int sz = 1;
 	while(!q.empty())
@@ -51,43 +53,28 @@ void bfs(state start_node)
 		q.pop();
 		for(auto v: neighbours(cur_node))
 		{
-			if(!vis[v.F][v.S])
-			{
-				vis[v.F][v.S] = 2, sz++;
-				q.push(v);
-			}
+			vis[v.F][v.S] = -1; // tempory mark
+			q.push(v);
+			component.push_back(v);
 		}
 	}
 	// now 2nd time BFS
-	vis[start_node.F][start_node.S] = 1;
-	if(sz ==1)
-	{
-		return;
-	}
-	eg[start_node.F][start_node.S] = sz;
-	q.push(start_node);
-	while(!q.empty())
-	{
-		state cur_node = q.front();
-		q.pop();
-		for(auto v: neighbours(cur_node,true))
-		{
-			if(vis[v.F][v.S]==2)
-			{
-				vis[v.F][v.S] = 1,eg[v.F][v.S] = sz;
-				q.push(v);
-			}
-		}
-	}
+	int size = component.size();
+	for (auto cell : component) {
+        vis[cell.F][cell.S] = (size == 1 ? 0 : size);
+    }
 }
 
 // travesal algorithm - BFS
 
 void solve()
 {
+	eg.clear();
+	vis.clear();
 	// input section
 	cin>>n>>m;
-	eg.assign(n, vector<int>(m));
+	eg.resize(n,vector<int>(m));
+	vis.assign(n, vector<int>(m,0));
 	for(int i=0;i<n;i++)
 	{
 		for(int j=0;j<m;j++)
@@ -97,14 +84,7 @@ void solve()
 	} 
 
 	// logic section
-	vis.assign(n, vector<int>(m, 0));
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			if (eg[i][j] == 1)
-			vis[i][j] = 1; // Treat wall as already processed
-		}
-	}
-	cout<<"\n";
+	
 
 	// now some terminolgy
 	// 0 -> not visited, 1 -> completed , 2->visited but not completed
@@ -112,7 +92,7 @@ void solve()
 	{
 		for(int j=0;j<m;j++)
 		{
-			if(!vis[i][j])
+			if(vis[i][j]==0 && eg[i][j]==0)
 			{
 				bfs({i,j});
 			}
@@ -122,15 +102,14 @@ void solve()
 
 
 	// for printing 
-	for(int i=0;i<n;i++)
-	{
-		for(int j=0;j<m;j++)
-		{
-			cout<<eg[i][j]<<" ";
-		}
-		cout<<endl;
-	}
-
+	// Print result
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (j) cout << " ";
+            cout << (eg[i][j] == 1 ? 1 : vis[i][j]);
+        }
+        cout << endl;
+    }
 }
 
 signed main(){
